@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+
+  hbase-node1:
+    image: local/hbase:1.2.6
+    hostname: hbase-node1
+    container_name: hbase-node1
+    environment: 
+      ZOOKEEPER_QUORUM: "zookeeper"
+      HADOOP_MASTER: hadoop-master
+      MASTER_BACKUPS: hbase-node2
+      REGIONSERVERS: "hbase-node1,hbase-node2,hbase-node3"
+    networks:
+      - docker-local
+
+  hbase-node2:
+    image: local/hbase:1.2.6
+    hostname: hbase-node2
+    container_name: hbase-node2
+    environment: 
+      ZOOKEEPER_QUORUM: "zookeeper"
+      HADOOP_MASTER: hadoop-master
+      MASTER_BACKUPS: hbase-node2
+      REGIONSERVERS: "hbase-node1,hbase-node2,hbase-node3"
+    networks:
+      - docker-local
+
+  hbase-node3:
+    image: local/hbase:1.2.6
+    hostname: hbase-node3
+    container_name: hbase-node3
+    environment: 
+      ZOOKEEPER_QUORUM: "zookeeper"
+      HADOOP_MASTER: hadoop-master
+      MASTER_BACKUPS: hbase-node2
+      REGIONSERVERS: "hbase-node1,hbase-node2,hbase-node3"
+    networks:
+      - docker-local
+
+
+networks:
+  docker-local:
+    external: true
