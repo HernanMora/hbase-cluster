@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   hbase-node1:
-    image: local/hbase:1.2.6
+    image: local/hbase:2.2.3
     hostname: hbase-node1
     container_name: hbase-node1
     environment: 
@@ -15,7 +15,7 @@ services:
       - docker-local
 
   hbase-node2:
-    image: local/hbase:1.2.6
+    image: local/hbase:2.2.3
     hostname: hbase-node2
     container_name: hbase-node2
     environment: 
@@ -27,7 +27,7 @@ services:
       - docker-local
 
   hbase-node3:
-    image: local/hbase:1.2.6
+    image: local/hbase:2.2.3
     hostname: hbase-node3
     container_name: hbase-node3
     environment: 

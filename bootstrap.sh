@@ -17,6 +17,6 @@ if [ ! -z "$MASTER_BACKUPS" ]  && [ ! -f "$BACKUP_MASTERS_CONFIG" ]; then
     echo $MASTER_BACKUPS | tr , '\n' > $BACKUP_MASTERS_CONFIG
 fi
 
-/usr/sbin/sshd
+service ssh start
 
 while true; do sleep 1000; done
