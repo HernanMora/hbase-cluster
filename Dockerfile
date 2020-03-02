@@ -1,28 +1,28 @@
-FROM alpine:3.8
+FROM ubuntu:16.04
 
 USER root
 
 # Prerequisites
-RUN apk add --no-cache openssh openssl openjdk8-jre rsync bash procps nss
+RUN apt-get update && apt-get install -y openssh-server openjdk-8-jdk wget vim \
+    libsnappy1v5 libsnappy-dev iputils-ping telnetd net-tools whois
 
-ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 
 ENV PATH $PATH:$JAVA_HOME/bin
 
 # Passwordless SSH
-RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key
-RUN ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key
-RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
-RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+RUN ssh-keygen -t rsa -f $HOME/.ssh/id_rsa -P "" ; \
+    cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 
-ADD config/ssh_config /root/.ssh/config
+ADD conf/ssh_config /root/.ssh/config
 RUN chmod 600 /root/.ssh/config
 RUN chown root:root /root/.ssh/config
 
-# unlock root
-RUN passwd -u root
+# Add Hadoop 2.9.2 native lib
+ENV LD_LIBRARY_PATH /usr/local/hadoop/lib/native
+ADD hadoop /usr/local/hadoop
 
 # Install Apche HBase
-ENV HBASE_VER 1.3.1
+ENV HBASE_VER 2.2.3
 
 RUN wget -O apache-hbase.tar.gz https://archive.apache.org/dist/hbase/$HBASE_VER/hbase-$HBASE_VER-bin.tar.gz && \
 	tar xzvf apache-hbase.tar.gz -C /usr/local/ && rm apache-hbase.tar.gz
@@ -34,11 +34,13 @@ ENV HBASE_HOME /usr/local/hbase
 ENV PATH $PATH:$HBASE_HOME/bin
 ENV HBASE_CONF_DIR $HBASE_HOME/conf
 
-# Add default conf files of 1 master, 2 back server, 3 engionserver
 ADD conf/hbase-site.xml $HBASE_HOME/conf
 ADD conf/hbase-env.sh $HBASE_HOME/conf
+ADD conf/hdfs-site.xml $HBASE_HOME/conf
 
 RUN mkdir -p /var/hbase/pids; chmod -R 755 /var/hbase/pids;
+
+RUN ulimit -n 8192
 
 WORKDIR $HBASE_HOME
 
